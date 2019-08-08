@@ -511,6 +511,7 @@ void ENV_CopyStartupInformation(void)
  */
 DWORD WINAPI GetFirmwareEnvironmentVariableA(LPCSTR name, LPCSTR guid, PVOID buffer, DWORD size)
 {
+    TRACE("CIFRA: GetFirmwareEnvironmentVariableA");
     FIXME("stub: %s %s %p %u\n", debugstr_a(name), debugstr_a(guid), buffer, size);
     SetLastError(ERROR_INVALID_FUNCTION);
     return 0;
@@ -521,6 +522,7 @@ DWORD WINAPI GetFirmwareEnvironmentVariableA(LPCSTR name, LPCSTR guid, PVOID buf
  */
 DWORD WINAPI GetFirmwareEnvironmentVariableW(LPCWSTR name, LPCWSTR guid, PVOID buffer, DWORD size)
 {
+    TRACE("CIFRA: GetFirmwareEnvironmentVariableW");
     FIXME("stub: %s %s %p %u\n", debugstr_w(name), debugstr_w(guid), buffer, size);
     SetLastError(ERROR_INVALID_FUNCTION);
     return 0;

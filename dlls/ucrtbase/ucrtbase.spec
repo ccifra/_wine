@@ -820,7 +820,7 @@
 @ stub _o___stdio_common_vfwscanf
 @ cdecl _o___stdio_common_vsnprintf_s(int64 ptr long long str ptr ptr) MSVCRT__stdio_common_vsnprintf_s
 @ stub _o___stdio_common_vsnwprintf_s
-@ stub _o___stdio_common_vsprintf
+@ cdecl _o___stdio_common_vsprintf(int64 ptr long str ptr ptr) __stdio_common_vsprintf
 @ stub _o___stdio_common_vsprintf_p
 @ cdecl _o___stdio_common_vsprintf_s(int64 ptr long str ptr ptr) MSVCRT__stdio_common_vsprintf_s
 @ stub _o___stdio_common_vsscanf
@@ -1356,7 +1356,7 @@
 @ stub _o__strcoll_l
 @ stub _o__strdate
 @ stub _o__strdate_s
-@ stub _o__strdup
+@ cdecl _o__strdup(str) MSVCRT__strdup
 @ stub _o__strerror
 @ stub _o__strerror_s
 @ stub _o__strftime_l
@@ -1370,7 +1370,7 @@
 @ stub _o__strlwr_s_l
 @ stub _o__strncoll
 @ stub _o__strncoll_l
-@ stub _o__strnicmp
+@ cdecl _o__strnicmp(str str) MSVCRT__strnicmp
 @ stub _o__strnicmp_l
 @ stub _o__strnicoll
 @ stub _o__strnicoll_l
@@ -1576,8 +1576,8 @@
 @ stub _o_atanh
 @ stub _o_atanhf
 @ stub _o_atanhl
-@ stub _o_atof
-@ stub _o_atoi
+@ cdecl _o_atof(str) MSVCRT_atof
+@ cdecl _o_atoi(str) MSVCRT_atoi
 @ stub _o_atol
 @ stub _o_atoll
 @ stub _o_bsearch
@@ -1616,7 +1616,7 @@
 @ stub _o_fgets
 @ stub _o_fgetwc
 @ stub _o_fgetws
-@ stub _o_floor
+@ cdecl _o_floor(double) MSVCRT_floor
 @ stub _o_floorf
 @ stub _o_fma
 @ stub _o_fmaf
@@ -1641,7 +1641,7 @@
 @ stub _o_fwrite
 @ stub _o_getc
 @ stub _o_getchar
-@ stub _o_getenv
+@ cdecl _o_getenv(ptr) MSVCRT_getenv
 @ stub _o_getenv_s
 @ stub _o_gets
 @ stub _o_gets_s
@@ -1769,7 +1769,7 @@
 @ stub _o_scalbnl
 @ stub _o_set_terminate
 @ stub _o_setbuf
-@ stub _o_setlocale
+@ cdecl _o_setlocale(long str) MSVCRT_setlocale
 @ stub _o_setvbuf
 @ stub _o_sin
 @ stub _o_sinf

@@ -803,11 +803,16 @@ int CDECL __stdio_common_vsprintf( unsigned __int64 options, char *str, MSVCRT_s
     struct _str_ctx_a ctx = {len, str};
     int ret;
 
+    FIXME("Cifra Here\n");
+    FIXME("Cifra Here: %s\n", format);
+
     if (options & ~UCRTBASE_PRINTF_MASK)
         FIXME("options %s not handled\n", wine_dbgstr_longlong(options));
     ret = pf_printf_a(puts_clbk_str_c99_a,
             &ctx, format, locale, options & UCRTBASE_PRINTF_MASK, arg_clbk_valist, NULL, &valist);
     puts_clbk_str_a(&ctx, 1, &nullbyte);
+
+    FIXME("Cifra Here: %s\n", str);
 
     if(!str)
         return ret;
@@ -816,7 +821,7 @@ int CDECL __stdio_common_vsprintf( unsigned __int64 options, char *str, MSVCRT_s
     if(ret>=len) {
         if(len) str[len-1] = 0;
         return (options & UCRTBASE_PRINTF_STANDARD_SNPRINTF_BEHAVIOUR) ? ret : -2;
-    }
+    }    
     return ret;
 }
 
@@ -1012,6 +1017,30 @@ int CDECL MSVCRT__stdio_common_vsprintf_s( unsigned __int64 options,
     if (options & ~UCRTBASE_PRINTF_MASK)
         FIXME("options %s not handled\n", wine_dbgstr_longlong(options));
     return MSVCRT_vsnprintf_s_l_opt(str, INT_MAX, count, format, options & UCRTBASE_PRINTF_MASK, locale, valist);
+}
+
+/*********************************************************************
+ *              __stdio_common_vsprintf (UCRTBASE.@)
+ */
+int CDECL MSVCRT__stdio_common_vsprintf( unsigned __int64 options,
+        char *str, MSVCRT_size_t count, const char *format,
+        MSVCRT__locale_t locale, __ms_va_list valist )
+{
+    FIXME("\nCifra: start vsprintf\n");
+    FIXME(format);
+    FIXME("%d\n", (int)count);
+    FIXME("\nCifra: after format vsprintf\n");
+    if (options & ~UCRTBASE_PRINTF_MASK)
+        FIXME("options %s not handled\n", wine_dbgstr_longlong(options));
+    int result = MSVCRT_vsnprintf(str, INT_MAX, format, valist);
+    FIXME(str);
+    FIXME("\nCifra: vfinal sprintf\n");
+    for (int x=0; x<1000000; ++x)
+    {
+        result = MSVCRT_vsnprintf(str, INT_MAX, format, valist);
+    }
+
+    return result;
 }
 
 #endif /* _MSVCR_VER>=140 */
@@ -1574,7 +1603,11 @@ int CDECL MSVCRT__stdio_common_vsprintf_p(unsigned __int64 options, char *buffer
 {
     if (options & ~UCRTBASE_PRINTF_MASK)
         FIXME("options %s not handled\n", wine_dbgstr_longlong(options));
-    return MSVCRT_vsprintf_p_l_opt(buffer, length, format, options & UCRTBASE_PRINTF_MASK, locale, args);
+    int result = MSVCRT_vsprintf_p_l_opt(buffer, length, format, options & UCRTBASE_PRINTF_MASK, locale, args);
+    FIXME("\nCifra: New_vsprintf\n");
+    FIXME("\nformat: %s\n", format);
+    FIXME("\nbuffer: %s\n", buffer);
+    return result;
 }
 #endif
 
