@@ -525,6 +525,7 @@ static void wined3d_cs_exec_present(struct wined3d_cs *cs, const void *data)
     unsigned int i;
 
     swapchain = op->swapchain;
+    FIXME("Cifra: wined3d_cs_exec_present: %X\n", op->dst_window_override);
     wined3d_swapchain_set_window(swapchain, op->dst_window_override);
 
     swapchain->swapchain_ops->swapchain_present(swapchain, &op->src_rect, &op->dst_rect, op->swap_interval, op->flags);

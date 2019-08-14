@@ -4210,15 +4210,22 @@ static void wined3d_context_gl_activate(struct wined3d_context_gl *context_gl,
     }
 }
 
+extern int CifraHwndChanged;
+
 struct wined3d_context *wined3d_context_gl_acquire(const struct wined3d_device *device,
         struct wined3d_texture *texture, unsigned int sub_resource_idx)
 {
     struct wined3d_context *current_context = context_get_current();
     struct wined3d_context *context;
 
+    //FIXME("Cifra: Acquire Context\n");
     TRACE("device %p, texture %p, sub_resource_idx %u.\n", device, texture, sub_resource_idx);
 
+    if (CifraHwndChanged)
+        current_context = NULL;
     if (current_context && current_context->destroyed)
+        current_context = NULL;
+    if (current_context && wined3d_context_gl(current_context)-> window != device->swapchains[0]->win_handle)
         current_context = NULL;
 
     if (!texture)
@@ -4244,10 +4251,12 @@ struct wined3d_context *wined3d_context_gl_acquire(const struct wined3d_device *
 
     if (current_context && current_context->current_rt.texture == texture)
     {
+        //FIXME("Cifra: Use Current Context\n");
         context = current_context;
     }
     else if (texture && !wined3d_resource_is_offscreen(&texture->resource))
     {
+        FIXME("Cifra: Render on screen get context\n");
         TRACE("Rendering onscreen.\n");
 
         if (!(context = swapchain_get_context(texture->swapchain)))
@@ -4255,11 +4264,12 @@ struct wined3d_context *wined3d_context_gl_acquire(const struct wined3d_device *
     }
     else
     {
+        FIXME("Cifra: Render offscreen get context\n");
         TRACE("Rendering offscreen.\n");
 
         /* Stay with the current context if possible. Otherwise use the
          * context for the primary swapchain. */
-        if (current_context && current_context->device == device)
+        if (current_context && current_context->device == device && wined3d_context_gl(current_context)->window == current_context->device->swapchains[0]->win_handle)
             context = current_context;
         else if (!(context = swapchain_get_context(device->swapchains[0])))
             return NULL;

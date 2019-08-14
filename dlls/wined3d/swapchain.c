@@ -142,18 +142,25 @@ void * CDECL wined3d_swapchain_get_parent(const struct wined3d_swapchain *swapch
     return swapchain->parent;
 }
 
+int CifraHwndChanged;
+
 void CDECL wined3d_swapchain_set_window(struct wined3d_swapchain *swapchain, HWND window)
 {
     if (!window)
         window = swapchain->device_window;
     if (window == swapchain->win_handle)
+    {
+        FIXME("Cifra: Setting HWND Match %X\n", window);
         return;
+    }
 
     TRACE("Setting swapchain %p window from %p to %p.\n",
             swapchain, swapchain->win_handle, window);
 
     wined3d_cs_finish(swapchain->device->cs, WINED3D_CS_QUEUE_DEFAULT);
 
+    FIXME("Cifra: Setting HWND Changed!\n");
+    //CifraHwndChanged = window;
     swapchain->win_handle = window;
 }
 
@@ -434,8 +441,30 @@ static void swapchain_gl_present(struct wined3d_swapchain *swapchain,
     struct wined3d_context *context;
     BOOL render_to_fbo;
 
+    if (swapchain->device->swapchains[0] != swapchain)
+    {
+        FIXME("\n\n\nCIFRA: IT IS NOT THE FIRST SWAPCHAIN!!!!!\n\n\n\n");
+        struct wined3d_swapchain *first = swapchain->device->swapchains[0];
+        for (int x=0; x<swapchain->device->swapchain_count; ++x)
+        {
+            if (swapchain->device->swapchains[x] == swapchain)
+            {
+                swapchain->device->swapchains[x] = first;
+                break;
+            }
+        }
+        swapchain->device->swapchains[0] = swapchain;
+    }
+
+
     context = context_acquire(swapchain->device, back_buffer, 0);
     context_gl = wined3d_context_gl(context);
+
+    if (CifraHwndChanged == swapchain->win_handle)
+    {
+        CifraHwndChanged = 0;
+    }
+
     if (!context_gl->valid)
     {
         context_release(context);
@@ -482,6 +511,7 @@ static void swapchain_gl_present(struct wined3d_swapchain *swapchain,
     }
 
     TRACE("Presenting DC %p.\n", context_gl->dc);
+    FIXME("Cifra: Presenting DC %p.\n", context_gl->dc);
 
     if (!(render_to_fbo = swapchain->render_to_fbo)
             && (src_rect->left || src_rect->top
@@ -491,6 +521,8 @@ static void swapchain_gl_present(struct wined3d_swapchain *swapchain,
             || dst_rect->right != swapchain->desc.backbuffer_width
             || dst_rect->bottom != swapchain->desc.backbuffer_height))
         render_to_fbo = TRUE;
+
+    ////render_to_fbo = TRUE;
 
     /* Rendering to a window of different size, presenting partial rectangles,
      * or rendering to a different window needs help from FBO_blit or a textured
@@ -763,6 +795,8 @@ static HRESULT swapchain_init(struct wined3d_swapchain *swapchain, struct wined3
 
     window = desc->device_window ? desc->device_window : device->create_parms.focus_window;
 
+    //CifraHwndChanged = window;
+    FIXME("Cifra: swapchain_init %X\n", window);
     swapchain->device = device;
     swapchain->parent = parent;
     swapchain->parent_ops = parent_ops;
@@ -1027,6 +1061,7 @@ static struct wined3d_context *swapchain_create_context(struct wined3d_swapchain
     struct wined3d_context **ctx_array;
 
     TRACE("Creating a new context for swapchain %p, thread %u.\n", swapchain, GetCurrentThreadId());
+    FIXME("Creating a new context for swapchain %p, wnd: %X, thread %u.\n", swapchain, swapchain->win_handle, GetCurrentThreadId());
 
     wined3d_from_cs(device->cs);
 
@@ -1084,15 +1119,20 @@ void swapchain_destroy_contexts(struct wined3d_swapchain *swapchain)
 
 struct wined3d_context *swapchain_get_context(struct wined3d_swapchain *swapchain)
 {
+    FIXME("Cifra: swapchain_get_context\n");
     DWORD tid = GetCurrentThreadId();
     unsigned int i;
 
-    for (i = 0; i < swapchain->num_contexts; ++i)
+    if (!CifraHwndChanged)
     {
-        if (wined3d_context_gl(swapchain->context[i])->tid == tid)
-            return swapchain->context[i];
+        for (i = 0; i < swapchain->num_contexts; ++i)
+        {
+            struct wined3d_context_gl* contextGl = wined3d_context_gl(swapchain->context[i]);
+            if (contextGl->tid == tid && contextGl->window == swapchain->win_handle)
+                return swapchain->context[i];
+        }
     }
-
+    FIXME("Cifra: Creating new swap chain\n");
     /* Create a new context for the thread */
     return swapchain_create_context(swapchain);
 }
